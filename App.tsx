@@ -2,7 +2,6 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { StylesVariables } from './const/variables';
 import PasswordInfo from './components';
-import './styles/global.css';
 
 export default function App() {
   return (
