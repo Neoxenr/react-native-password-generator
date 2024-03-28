@@ -1,9 +1,14 @@
+import { FC } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 
-export const PasswordResult = () => {
+type PasswordResultProps = {
+  password: string;
+}
+
+export const PasswordResult: FC<PasswordResultProps> = ({password}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.result}>123zxc</Text>
+      <Text style={styles.result}>{password}</Text>
     </View>
   );
 };

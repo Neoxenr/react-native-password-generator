@@ -1,43 +1,43 @@
-import { useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Text, View, Switch, Button, StyleSheet } from 'react-native';
+import { SETTINGS_ITEMS } from './const/settings-items';
+import { SettingsItem } from './types/settings-item';
+import { generatePassword } from './utils/generate-password';
 
-type SwitchItem = {
-  label: string;
-  value: boolean;
+type PasswordSettingsProps = {
+  onChangePassword: (_newPassword: string) => void;
 };
 
-const SETTINGS_ITEMS: SwitchItem[] = [
-  {
-    label: 'Uppercase letters',
-    value: false,
-  },
-  {
-    label: 'Lowercase letters',
-    value: false,
-  },
-  {
-    label: 'Number',
-    value: false,
-  },
-  {
-    label: 'Symbols',
-    value: false,
-  },
-];
+export const PasswordSettings: FC<PasswordSettingsProps> = ({
+  onChangePassword,
+}) => {
+  const [settings, setSettings] = useState<SettingsItem[]>(SETTINGS_ITEMS);
 
-export const PasswordSettings = () => {
-  const [settings, setSettings] = useState<SwitchItem[]>(SETTINGS_ITEMS);
+  const isDisabled = useMemo(() => !settings.some(({isSelected}) => isSelected), [settings])
 
-  const handleChangeValue = useCallback(
+  const handleChangeSettings = useCallback(
     (name: string) => {
       const newSettings = settings.map((item) =>
-        item.label === name ? { ...item, value: !item.value } : item
+        item.label === name ? { ...item, isSelected: !item.isSelected } : item
       );
 
       setSettings(newSettings);
     },
     [settings]
   );
+
+  const handlePasswordGenerating = useCallback(() => {
+    const characters = settings
+      .filter(({ isSelected }) => isSelected)
+      .reduce(
+        (resultCharacters, item) => resultCharacters.concat(item.characters),
+        [] as string[]
+      );
+
+    const newPassword = generatePassword(characters, 10);
+
+    onChangePassword(newPassword);
+  }, [settings, onChangePassword]);
 
   return (
     <View style={styles.container}>
@@ -46,22 +46,18 @@ export const PasswordSettings = () => {
         <Text>10</Text>
       </View>
       <View style={styles.actions}>
-        {settings.map(({ label, value }) => (
+        {settings.map(({ label, isSelected }) => (
           <Switch
             key={label}
-            value={value}
-            onChange={() => handleChangeValue(label)}
+            value={isSelected}
+            onChange={() => handleChangeSettings(label)}
           />
         ))}
       </View>
       <View>
         <Text>Strength</Text>
-        <View></View>
-        <View></View>
-        <View></View>
-        <View></View>
       </View>
-      <Button title="Generate" />
+      <Button title="generate" disabled={isDisabled} onPress={handlePasswordGenerating} />
     </View>
   );
 };
