@@ -4,6 +4,7 @@ import { SETTINGS_ITEMS } from './const/settings-items';
 import { SettingsItem } from './types/settings-item';
 import { generatePassword } from './utils/generate-password';
 import Slider from '@react-native-community/slider';
+import Checkbox from 'expo-checkbox';
 
 type PasswordSettingsProps = {
   onChangePassword: (_newPassword: string) => void;
@@ -23,6 +24,11 @@ export const PasswordSettings: FC<PasswordSettingsProps> = ({
 
   const isDisabled = useMemo(
     () => !settings.some(({ isSelected }) => isSelected),
+    [settings]
+  );
+
+  const strengthLength = useMemo(
+    () => settings.filter(({ isSelected }) => isSelected).length,
     [settings]
   );
 
@@ -53,27 +59,46 @@ export const PasswordSettings: FC<PasswordSettingsProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text>Characters length</Text>
-        <Text>{passwordLength}</Text>
+        <Text style={styles.info}>Characters Length</Text>
+        <Text style={styles.length}>{passwordLength}</Text>
       </View>
       <Slider
+        style={styles.slider}
         step={SLIDER_STEP}
         value={passwordLength}
         minimumValue={MIN_PASSWORD_LENGTH}
         maximumValue={MAX_PASSWORD_LENGTH}
+        minimumTrackTintColor="#7ac835"
+        maximumTrackTintColor="#000000"
+        thumbTintColor="#fff"
         onValueChange={setPasswordLength}
       />
       <View style={styles.actions}>
         {settings.map(({ label, isSelected }) => (
-          <Switch
-            key={label}
-            value={isSelected}
-            onChange={() => handleSettingsChanging(label)}
-          />
+          <View key={label} style={styles.checkbox}>
+            <Checkbox
+              value={isSelected}
+              onValueChange={() => handleSettingsChanging(label)}
+              color={isSelected ? '#7AC835' : undefined}
+            />
+            <Text style={styles.checkboxName}>{label}</Text>
+          </View>
         ))}
       </View>
-      <View>
-        <Text>Strength</Text>
+      <View style={styles.strength}>
+        <Text style={styles.strengthInfo}>Strength</Text>
+        <View style={styles.strengthLevels}>
+          {[...Array(strengthLength).keys()].map(() => (
+            <View
+              style={[styles.strengthLevel, styles.filledStrengthLevel]}
+            ></View>
+          ))}
+          {[...Array(settings.length - strengthLength).keys()].map(() => (
+            <View
+              style={[styles.strengthLevel, styles.emptyStrengthLevel]}
+            ></View>
+          ))}
+        </View>
       </View>
       <Button
         title="generate"
@@ -86,13 +111,63 @@ export const PasswordSettings: FC<PasswordSettingsProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'gray',
+    rowGap: 20,
+    padding: 16,
+    width: '100%',
+    backgroundColor: '#242323',
   },
   header: {
-    flexDirection: 'row',
     columnGap: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  info: {
+    color: 'white',
+  },
+  length: {
+    fontSize: 20,
+    color: '#7AC835',
   },
   actions: {
     alignItems: 'flex-start',
+    rowGap: 20,
+  },
+  checkbox: {
+    flexDirection: 'row',
+    columnGap: 20,
+  },
+  checkboxName: {
+    color: 'white',
+  },
+  slider: {
+    width: '100%',
+  },
+  strength: {
+    padding: 12,
+    backgroundColor: '#000',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  strengthInfo: {
+    color: 'gray',
+    textTransform: 'uppercase',
+    opacity: 0.7,
+  },
+  strengthLevels: {
+    columnGap: 4,
+    flexDirection: 'row'
+  },
+  strengthLevel: {
+    width: 8,
+    height: 16,
+    borderColor: '#fff',
+    borderWidth: 1
+  },
+  filledStrengthLevel: {
+    backgroundColor: 'yellow',
+  },
+  emptyStrengthLevel: {
+    backgroundColor: '#000',
   },
 });

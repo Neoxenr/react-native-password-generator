@@ -3,23 +3,37 @@ import { Text, View, StyleSheet } from 'react-native';
 
 type PasswordResultProps = {
   password: string;
-}
+};
 
-export const PasswordResult: FC<PasswordResultProps> = ({password}) => {
+export const PasswordResult: FC<PasswordResultProps> = ({ password }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.result}>{password}</Text>
+      {password ? (
+        <Text style={styles.result}>{password}</Text>
+      ) : (
+        <Text style={styles.resultPlaceholder}>
+          Generate password please...
+        </Text>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
+    width: '100%',
+    padding: 16,
+    alignItems: 'flex-start',
     justifyContent: 'center',
-    backgroundColor: 'gray',
+    backgroundColor: '#242323',
   },
   result: {
+    fontSize: 16,
     color: 'white',
+  },
+  resultPlaceholder: {
+    fontSize: 16,
+    color: 'yellow',
+    fontStyle: 'italic'
   },
 });
