@@ -1,18 +1,29 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import * as Clipboard from 'expo-clipboard';
 
 type PasswordResultProps = {
   password: string;
 };
 
 export const PasswordResult: FC<PasswordResultProps> = ({ password }) => {
+  const handleClick = useCallback(() => {
+    Clipboard.setStringAsync(password);
+  }, [password]);
+
   return (
     <View style={styles.container}>
       {password ? (
-        <Text style={styles.result}>{password}</Text>
+        <>
+          <Text style={styles.result} selectable>
+            {password}
+          </Text>
+          <FontAwesome.Button style={styles.copyButton} name="copy" onPress={handleClick} />
+        </>
       ) : (
         <Text style={styles.resultPlaceholder}>
-          Generate password please...
+          Generated password
         </Text>
       )}
     </View>
@@ -23,9 +34,14 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     padding: 16,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#242323',
+  },
+  copyButton: {
+    backgroundColor: "#4096ff",
+    paddingRight: 0
   },
   result: {
     fontSize: 16,
@@ -33,7 +49,7 @@ const styles = StyleSheet.create({
   },
   resultPlaceholder: {
     fontSize: 16,
-    color: 'yellow',
-    fontStyle: 'italic'
+    opacity: 0.2,
+    color: 'gray',
   },
 });

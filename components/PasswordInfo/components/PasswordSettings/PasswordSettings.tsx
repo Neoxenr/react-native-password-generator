@@ -1,5 +1,12 @@
 import { FC, useCallback, useMemo, useState } from 'react';
-import { Text, View, Switch, Button, StyleSheet } from 'react-native';
+import {
+  Text,
+  View,
+  Button,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
 import { SETTINGS_ITEMS } from './const/settings-items';
 import { SettingsItem } from './types/settings-item';
 import { generatePassword } from './utils/generate-password';
@@ -75,36 +82,47 @@ export const PasswordSettings: FC<PasswordSettingsProps> = ({
       />
       <View style={styles.actions}>
         {settings.map(({ label, isSelected }) => (
-          <View key={label} style={styles.checkbox}>
+          <TouchableOpacity
+            key={label}
+            style={styles.checkbox}
+            onPress={() => handleSettingsChanging(label)}
+          >
             <Checkbox
               value={isSelected}
               onValueChange={() => handleSettingsChanging(label)}
               color={isSelected ? '#7AC835' : undefined}
             />
             <Text style={styles.checkboxName}>{label}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
       <View style={styles.strength}>
         <Text style={styles.strengthInfo}>Strength</Text>
         <View style={styles.strengthLevels}>
-          {[...Array(strengthLength).keys()].map(() => (
+          {[...Array(strengthLength).keys()].map((_, i) => (
             <View
+              key={i}
               style={[styles.strengthLevel, styles.filledStrengthLevel]}
             ></View>
           ))}
-          {[...Array(settings.length - strengthLength).keys()].map(() => (
+          {[...Array(settings.length - strengthLength).keys()].map((_, i) => (
             <View
+              key={i}
               style={[styles.strengthLevel, styles.emptyStrengthLevel]}
             ></View>
           ))}
         </View>
       </View>
-      <Button
-        title="generate"
+      <Pressable
         disabled={isDisabled}
+        style={[
+          styles.confirmButton,
+          isDisabled ? styles.disabledConfirmButton : null,
+        ]}
         onPress={handlePasswordGenerating}
-      />
+      >
+        <Text style={styles.confirmButtonText}>Generate</Text>
+      </Pressable>
     </View>
   );
 };
@@ -156,18 +174,38 @@ const styles = StyleSheet.create({
   },
   strengthLevels: {
     columnGap: 4,
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   strengthLevel: {
     width: 8,
     height: 16,
     borderColor: '#fff',
-    borderWidth: 1
+    borderWidth: 1,
   },
   filledStrengthLevel: {
     backgroundColor: 'yellow',
   },
   emptyStrengthLevel: {
     backgroundColor: '#000',
+  },
+  confirmButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 4,
+    elevation: 3,
+    backgroundColor: '#4096ff',
+  },
+  disabledConfirmButton: {
+    backgroundColor: 'gray',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: 'bold',
+    letterSpacing: 0.25,
+    color: 'white',
+    textTransform: 'uppercase',
   },
 });
